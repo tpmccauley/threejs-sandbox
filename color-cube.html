@@ -1,0 +1,105 @@
+<!-- thomas.mccauley@cern.ch -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title></title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+			#stats {
+  			position: absolute;
+  			top:0;
+  			left: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="axes"></div>
+		<script src="js/three.min.js"></script>
+		<script src="js/stats.min.js"></script>
+		<script src="js/TrackballControls.js"></script>
+		<script>
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+
+			var scene = new THREE.Scene();
+			var stats = new Stats();
+			document.body.appendChild(stats.domElement);
+
+			var camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+			camera.position.x = 1.0;
+			camera.position.y = 1.0;
+			camera.position.z = 1.0;
+
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize(w, h);
+			renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+
+			document.body.appendChild(renderer.domElement);
+
+			var controls = new THREE.TrackballControls(camera, renderer.domElement);
+			controls.rotateSpeed = 3.0;
+      controls.zoomSpeed = 0.5;
+
+			var ambientLight = new THREE.AmbientLight(0x404040);
+			scene.add(ambientLight);
+
+			var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(0, 0.5, 1);
+      scene.add(directionalLight);
+
+			var axes = new THREE.AxisHelper(2);
+			//scene.add(axes);
+
+			var object = new THREE.Object3D({name:'cube'});
+
+			var nx = 10;
+			var ny = 10;
+			var nz = 10;
+
+			var cx = 0.10;
+			var cy = 0.10;
+			var cz = 0.10;
+
+			for ( var i = 0; i < nx; i++ ) {
+				for ( var j = 0; j < ny; j++ ) {
+					for ( var k = 0; k < nz; k++ ) {
+
+						var s = Math.random();
+						//var o = Math.random();
+						var o = 1.0;
+
+						var x = (i + 0.5)*cx - nx*cx*0.5;
+						var y = (j + 0.5)*cy - ny*cy*0.5;
+						var z = (k + 0.5)*cz - nz*cz*0.5;
+
+						var color = new THREE.Color(i/nx,j/ny,k/nz);
+						var box = new THREE.Mesh(new THREE.BoxGeometry(s*cx,s*cy,s*cz), new THREE.MeshPhongMaterial({color:color, transparent:true, opacity:o}));
+
+						box.position.x = x;
+						box.position.y = y;
+						box.position.z = z;
+						object.add(box);
+					}
+				}
+			}
+
+			scene.add(object);
+
+			var render = function () {
+				requestAnimationFrame(render);
+				renderer.render(scene, camera);
+
+				object.rotation.x += 0.01;
+				object.rotation.y += 0.01;
+
+				controls.update();
+				stats.update();
+			};
+
+			render();
+		</script>
+	</body>
+</html>
