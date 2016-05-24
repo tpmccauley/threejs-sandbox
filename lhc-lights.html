@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title></title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+			#stats {
+  			position: absolute;
+  			top:0;
+  			left: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="axes"></div>
+		<script src="js/three.min.js"></script>
+		<script src="js/stats.min.js"></script>
+		<script>
+			var w = window.innerWidth;
+			var h = window.innerHeight;
+
+			var scene = new THREE.Scene();
+			var stats = new Stats();
+			document.body.appendChild(stats.domElement);
+
+			// Args: field-of-view, aspect ratio, near, far
+			var camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+			// Position the camera at the origin
+			camera.position.x = 0;
+			camera.position.y = 0;
+			camera.position.z = 0;
+
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setSize(w, h);
+			renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+
+			document.body.appendChild(renderer.domElement);
+
+			var light = new THREE.AmbientLight(0x404040);
+			//scene.add(light); let's not add the ambient light to the scene
+
+			var sphere = new THREE.SphereGeometry(0.01); // radius
+
+			var p1 = new THREE.PointLight(0xff0000, 1, 5); // color, intensity, distance
+			p1.add(new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0xff0000})));
+			scene.add(p1);
+
+			var p2 = new THREE.PointLight(0x00ff00, 1, 5); // color, intensity, distance
+			p2.add(new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x00ff00 })));
+			scene.add(p2);
+
+			var p3 = new THREE.PointLight(0x0000ff, 1, 5); // color, intensity, distance
+			p3.add(new THREE.Mesh(sphere, new THREE.MeshBasicMaterial({ color: 0x0000ff })));
+			scene.add(p3);
+
+      var geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+
+			var textures = ["img/1.png",
+											"img/2.jpg",
+											"img/3.jpg",
+											"img/4.png",
+											"img/5.jpg"];
+
+			var materials = [];
+			for ( var i = 0; i < textures.length; i ++ ) {
+				materials[i] = new THREE.MeshPhongMaterial({map:new THREE.TextureLoader().load(textures[i])});
+			}
+
+			for ( var j = 0; j < 1000; j++ ) {
+
+				var ti = Math.floor(Math.random()*5);
+				var object = new THREE.Mesh(geometry, materials[ti]);
+
+				object.position.x = Math.random()*10 - 5;
+				object.position.y = Math.random()*10 - 5;
+				object.position.z = Math.random()*10 - 5;
+				object.rotation.x = Math.random()*2*Math.PI;
+				object.rotation.y = Math.random()*2*Math.PI;
+				object.rotation.z = Math.random()*2*Math.PI;
+
+				scene.add(object);
+			}
+
+			var theta = 0;
+
+			var render = function () {
+				requestAnimationFrame(render);
+				renderer.render(scene, camera);
+
+				var time = Date.now()*0.0005;
+
+				p1.position.x = Math.sin(time*0.7);
+				p1.position.y = Math.cos(time*0.5);
+				p1.position.z = Math.cos(time*0.3);
+
+				p2.position.x = Math.cos(time*0.3);
+				p2.position.y = Math.sin(time*0.5);
+				p2.position.z = Math.sin(time*0.7);
+
+				p3.position.x = Math.sin(time*0.7);
+				p3.position.y = Math.cos(time*0.3);
+				p3.position.z = Math.sin(time*0.5);
+
+				theta += 0.1;
+				camera.position.x = Math.sin(THREE.Math.degToRad(theta));
+				camera.position.y = Math.sin(THREE.Math.degToRad(theta));
+				camera.position.z = Math.cos(THREE.Math.degToRad(theta));
+				camera.lookAt(scene.position);
+				camera.updateMatrixWorld();
+
+				stats.update();
+			};
+
+			render();
+		</script>
+	</body>
+</html>
