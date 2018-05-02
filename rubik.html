@@ -43,16 +43,6 @@
 			controls.rotateSpeed = 3.0;
       controls.zoomSpeed = 0.5;
 
-			var ambientLight = new THREE.AmbientLight(0x404040);
-			scene.add(ambientLight);
-
-			var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(0, 0.5, 1);
-      scene.add(directionalLight);
-
-			var axes = new THREE.AxisHelper(2);
-			//scene.add(axes);
-
 			// Hmmm. Seems that my cube from I was 13 or so is rgb: x,y,-z
 			// Not that it matters much...
 
@@ -90,31 +80,59 @@
 						var z = (k + 0.5)*size - nz*0.5*size;
 
 						var box = new THREE.Mesh(geometry, material);
-						var edges = new THREE.EdgesHelper(box, 0x000000);
 
 						box.position.x = x;
 						box.position.y = y;
 						box.position.z = z;
 
-						object.add(box);
-						object.add(edges);
+						scene.add(box);
 					}
 				}
 			}
-
-			scene.add(object);
 
 			var xaxis = new THREE.Vector3(1,0,0);
 			var yaxis = new THREE.Vector3(0,1,0);
 			var zaxis = new THREE.Vector3(0,0,1);
 
+			var object = new THREE.Object3D();
+			var active = [];
+
+			// Using attach and detach from SceneUtils follows from
+			// http://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
+
+			function setActive() {
+				for ( var i = 0; i < 27; i++ ) {
+					if ( scene.children[i].position.x > 0 ) {
+						active.push(i);
+					}
+				}
+			}
+
+			function rotate() {
+				object.rotation.x += 0.01;
+			}
+
 			var render = function () {
 				requestAnimationFrame(render);
 				renderer.render(scene, camera);
 
+				//rotate();
+
 				controls.update();
 				stats.update();
 			};
+
+			var ambientLight = new THREE.AmbientLight(0x404040);
+			scene.add(ambientLight);
+
+			var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+			directionalLight.position.set(0, 0.5, 1);
+			scene.add(directionalLight);
+
+			var axes = new THREE.AxisHelper(2);
+			//scene.add(axes);
+
+			setActive();
 
 			render();
 		</script>
